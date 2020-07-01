@@ -1,5 +1,28 @@
 #!/usr/bin/env bash
 
+#====================== log ======================
+
+log_info() {
+  # Usage: log_info "this is the info log message"
+  echo "$(date "+%Y-%m-%d %H:%M:%S") [INFO]: $@"
+}
+
+log_warnning() {
+  # Usage: log_warnning "this is the warning log message"
+  echo "$(date "+%Y-%m-%d %H:%M:%S") [WARN]: $@"
+}
+
+log_error() {
+  # Usage: log_error "this is the error log message"
+  echo "$(date "+%Y-%m-%d %H:%M:%S") [ERROR]: $@"
+}
+
+log_exit() {
+  # Usage: log_exit "the log message before exit"
+  log_error "$@"
+  exit 1
+}
+
 # ====================== date ======================
 
 date_format() {
@@ -7,6 +30,7 @@ date_format() {
   local d
   local formatter
   d=$1
+  [[ -z ${d} ]] && log_exit "Usage: date_format [date] [formatter(optional)]"
   formatter=$2
   foramtter=${formatter:="%Y%m%d"}
   echo $(date -d "${d}" "+${formatter}")
@@ -17,6 +41,7 @@ get_date_from() {
   local base_date
   local interval
   base_date=$1
+  [[ -z ${base_date} ]] && log_exit "Usage: get_date_from [date] [interval day(optional)]"
   interval=$2
   interval=${interval:=0}
   echo $(date -d "${base_date} ${interval} day" "+%Y%m%d")
@@ -32,37 +57,24 @@ get_timestamp() {
   echo $(date "+%Y-%m-%d %H:%M:%S")
 }
 
+get_timestamp_compact_sec() {
+  # Usage: get_timestamp_compact_sec
+  echo $(date "+%Y%m%d%H%M%S")
+}
+
+get_timestamp_compact_milli() {
+  # Usage: get_timestamp_compact_milli
+  echo $(date "+%Y%m%d%H%M%S%N") | cut -c1-17
+}
+
 get_unix_milli() {
   # Usage: get_unix_milli
-  echo $(($(date "+%s%N") / 1000000))
+  echo $(date "+%s%N") | cut -c1-13
 }
 
 get_unix_sec() {
   # Usage: get_unix_sec
   echo $(date "+%s")
-}
-
-#====================== log ======================
-
-log_info() {
-  # Usage: log_info "this is the info log message"
-  echo "$(get_timestamp) [INFO]: $@"
-}
-
-log_warnning() {
-  # Usage: log_warnning "this is the warning log message"
-  echo "$(get_timestamp) [WARN]: $@"
-}
-
-log_error() {
-  # Usage: log_error "this is the error log message"
-  echo "$(get_timestamp) [ERROR]: $@"
-}
-
-log_exit() {
-  # Usage: log_exit "the log message before exit"
-  log_error "$@"
-  exit 1
 }
 
 #====================== echo ======================
