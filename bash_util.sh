@@ -1,5 +1,33 @@
 #!/usr/bin/env bash
 
+#====================== file ======================
+function get_filename() {
+  echo $(basename "$0")
+}
+
+function get_curpath() {
+  echo $(dirname "$0")
+}
+
+function get_abspath() {
+  filename=$1
+  parentdir=$(dirname "${filename}")
+
+  if [ -d "${filename}" ]; then
+    echo "$(cd "${filename}" && pwd)"
+  elif [ -d "${parentdir}" ]; then
+    echo "$(cd "${parentdir}" && pwd)/$(basename "${filename}")"
+  fi
+}
+
+function get_real_script_name() {
+  echo "$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
+}
+
+function get_real_script_path() {
+  echo "$(dirname "$(test -L "$0" && readlink "$0" || echo "$0")")"
+}
+
 #====================== log ======================
 
 function log_info() {
@@ -284,33 +312,6 @@ function string_ends_with() {
 function string_regex() {
   # Usage: string_regex "string" "regex"
   [[ $1 =~ $2 ]] && printf '%s\n' "${BASH_REMATCH[1]}"
-}
-
-#====================== array ======================
-# reference https://github.com/dylanaraps/pure-bash-bible
-function array_reverse() {
-  # Usage: array_reverse "array"
-  shopt -s extdebug
-  f() (printf '%s\n' "${BASH_ARGV[@]}")
-  f "$@"
-  shopt -u extdebug
-}
-
-function array_remove_dups() {
-  # Usage: array_remove_dups "array"
-  declare -A tmp_array
-
-  for i in "$@"; do
-    [[ "$i" ]] && IFS=" " tmp_array["${i:- }"]=1
-  done
-
-  printf '%s\n' "${!tmp_array[@]}"
-}
-
-function array_random_element() {
-  # Usage: array_random_element "array"
-  local arr=("$@")
-  printf '%s\n' "${arr[RANDOM % $#]}"
 }
 
 #====================== program ======================
